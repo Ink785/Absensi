@@ -1,0 +1,42 @@
+<!-- templates/laporan.html -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Laporan Absensi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    {% include 'sidebar.html' %}
+
+    <!-- Main Content -->
+    <main class="flex-1 p-10">
+      <h1 class="text-2xl font-bold mb-6">📄 Laporan Absensi</h1>
+
+      <div class="overflow-x-auto bg-white rounded-xl shadow">
+        <table class="min-w-full text-left">
+          <thead class="bg-blue-50 text-gray-700">
+            <tr>
+              <th class="p-3">Nama</th>
+              <th class="p-3">Kelas</th>
+              <th class="p-3">Tanggal</th>
+              <th class="p-3">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Data dummy -->
+            <tr class="border-t">
+              <td class="p-3">Siti Rahma</td>
+              <td class="p-3">7A</td>
+              <td class="p-3">2025-05-15</td>
+              <td class="p-3 text-green-600 font-semibold">Hadir</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

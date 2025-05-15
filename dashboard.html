@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Absensi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3176/3176360.png" />
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans">
+
+  <!-- Sidebar -->
+  <div class="flex min-h-screen">
+    <aside class="w-64 bg-white shadow-md p-5 space-y-6">
+      <h2 class="text-2xl font-bold text-blue-600">Absensi Siswa</h2>
+      <nav class="flex flex-col space-y-2">
+        <a href="#" class="text-gray-700 hover:bg-blue-100 p-2 rounded">🏠 Dashboard</a>
+        <a href="/input" class="text-gray-700 hover:bg-blue-100 p-2 rounded">📝 Input Absensi</a>
+        <a href="/laporan" class="text-gray-700 hover:bg-blue-100 p-2 rounded">📄 Laporan</a>
+        <a href="/pengaturan" class="text-gray-700 hover:bg-blue-100 p-2 rounded">⚙️ Pengaturan</a>
+        <a href="/logout" class="text-red-500 hover:bg-red-100 p-2 rounded">🚪 Logout</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-10">
+      <h1 class="text-3xl font-semibold mb-6">Selamat Datang di Dashboard</h1>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-white rounded-xl shadow p-5">
+          <h2 class="text-xl font-semibold mb-2">👨‍🎓 Total Siswa</h2>
+          <p class="text-3xl font-bold text-blue-600">60</p>
+        </div>
+        <div class="bg-white rounded-xl shadow p-5">
+          <h2 class="text-xl font-semibold mb-2">📅 Hari Ini Hadir</h2>
+          <p class="text-3xl font-bold text-green-600">54</p>
+        </div>
+        <div class="bg-white rounded-xl shadow p-5">
+          <h2 class="text-xl font-semibold mb-2">❌ Tidak Hadir</h2>
+          <p class="text-3xl font-bold text-red-500">6</p>
+        </div>
+      </div>
+
+      <div class="mt-10">
+        <h3 class="text-xl font-bold mb-4">Riwayat Absensi Terbaru</h3>
+        <div class="overflow-x-auto bg-white rounded-xl shadow">
+          <table class="min-w-full text-left">
+            <thead class="bg-blue-50 text-gray-700">
+              <tr>
+                <th class="p-3">Nama</th>
+                <th class="p-3">Kelas</th>
+                <th class="p-3">Tanggal</th>
+                <th class="p-3">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-t">
+                <td class="p-3">Ahmad Fikri</td>
+                <td class="p-3">Kelas 7A</td>
+                <td class="p-3">2025-05-15</td>
+                <td class="p-3 text-green-600 font-semibold">Hadir</td>
+              </tr>
+              <tr class="border-t">
+                <td class="p-3">Budi Setiawan</td>
+                <td class="p-3">Kelas 7A</td>
+                <td class="p-3">2025-05-15</td>
+                <td class="p-3 text-red-500 font-semibold">Alpha</td>
+              </tr>
+              <!-- Tambahkan data lain di sini -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+</body>
+</html>
