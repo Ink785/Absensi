@@ -60,9 +60,9 @@ def input_absensi():
 def laporan():
     return render_template('laporan.html')
 
-@app.route('/pengaturan')
-def pengaturan():
-    return render_template('pengaturan.html')
+# @app.route('/pengaturan')
+# def pengaturan():
+#     return render_template('pengaturan.html')
 
 @app.route('/logout')
 def logout():
