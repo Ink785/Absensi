@@ -5,7 +5,7 @@ const dtAbsensi = document.getElementById("dt_absensi");
 const cboStatus = document.getElementById("cbo_status");
 
 // Saat kelas dipilih, tampilkan daftar siswa
-kelasSelect.addEventListener("change", () => {
+$('#kelas').on('change', function() {
   let kelas = kelasSelect.value;
   fetch("/siswa", {
     method: "POST",
