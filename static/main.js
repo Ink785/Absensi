@@ -1,9 +1,12 @@
 
 const kelasSelect = document.getElementById("kelas");
-const cboNama = document.getElementById("nama");
+const cboSiswa = document.getElementById("siswa");
+const dtAbsensi = document.getElementById("dt_absensi");
+const cboStatus = document.getElementById("cbo_status");
+
 // Saat kelas dipilih, tampilkan daftar siswa
 kelasSelect.addEventListener("change", () => {
-  const kelas = kelasSelect.value;
+  let kelas = kelasSelect.value;
   fetch("/siswa", {
     method: "POST",
     headers: {
@@ -14,14 +17,14 @@ kelasSelect.addEventListener("change", () => {
   .then(response => response.json())
   .then(data => {
     // Kosongkan dulu opsi nama
-    cboNama.innerHTML = '<option value="">Pilih Nama</option>';
+    cboSiswa.innerHTML = '<option value="">Pilih Nama</option>';
 
     // Tambahkan nama-nama dari response
     data.forEach(siswa => {
       const option = document.createElement("option");
-      option.value = siswa.nama;
-      option.textContent = siswa.nama;
-      cboNama.appendChild(option);
+      option.value = siswa.nis;
+      option.textContent = "[ " + siswa.nis + " ] " + siswa.kelas + " : " + siswa.nama + " - " + siswa .nomor ;
+      cboSiswa.appendChild(option);
     });
   })
   .catch(error => {
@@ -31,25 +34,27 @@ kelasSelect.addEventListener("change", () => {
 
 
 // Simpan ke backend Flask
-document.querySelector("button.bg-blue-600").addEventListener("click", () => {
-  const kelas = kelasSelect.value;
-  const tanggal = tanggalInput.value;
+document.getElementById("form_input_absensi").addEventListener("submit", function (event) {
+  event.preventDefault(); 
 
-  const data = [];
-  document.querySelectorAll(".status-select").forEach(select => {
-    data.push({
-      nama: select.dataset.nama,
-      status: select.value
-    });
-  });
+  // let kelas = kelasSelect.value;
+  let tanggal = dtAbsensi.value;
+  let nis = cboSiswa.value;
+  let status = cboStatus.value;
 
-  fetch("/absensi", {
-    method: "GET",
+  fetch("/simpan_absensi", {
+    method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ kelas, tanggal, data })
+    body: JSON.stringify({nis, tanggal, status })
   })
   .then(res => res.json())
   .then(res => {
-    alert("Absensi berhasil disimpan!");
+    alert(res.message || "Absensi berhasil disimpan!");
+    // window.location.href = "/input"; // Redirect jika berhasil
+  })
+  .catch(err => {
+    console.error("Gagal simpan:", err);
+    alert("Terjadi kesalahan saat menyimpan absensi.");
   });
 });
+
