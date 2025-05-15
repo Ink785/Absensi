@@ -136,6 +136,9 @@ def simpan_absensi():
     if not nis or nis.strip() == "":
         return jsonify({"message": "NIS tidak ditemukan."}), 200
 
+    if not tanggal or tanggal.strip() =="" :
+        return jsonify({"message": "Pilih tanggal."}), 200
+
     # Ambil data siswa berdasarkan NIS
     dSiswa = get_siswa_by_nis(nis)
     if not dSiswa:
