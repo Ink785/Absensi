@@ -150,5 +150,25 @@ def pengaturan():
     return render_template('pengaturan.html', siswa=siswa, pesan=pesan)
 
 
+@app.route('/siswa', methods=["POST"])
+def get_siswa():
+    data = request.get_json()
+    kelas = data.get("kelas") if data else None
+
+    # Data statis dummy siswa
+    siswa_list = [
+        {"nama": "Ahmad", "kelas": "7A", "nomor": "6281234567890"},
+        {"nama": "Budi", "kelas": "7B", "nomor": "6289876543210"},
+        {"nama": "Citra", "kelas": "7A", "nomor": "6281122334455"},
+        {"nama": "Dina", "kelas": "8A", "nomor": "6289988776655"},
+    ]
+
+    # Filter berdasarkan kelas jika ada
+    if kelas:
+        filtered_siswa = [s for s in siswa_list if s['kelas'] == kelas]
+        return jsonify(filtered_siswa)
+
+    return jsonify(siswa_list)
+
 if __name__ == '__main__':
     app.run(debug=True)
