@@ -19,6 +19,7 @@
         <table class="min-w-full text-left">
           <thead class="bg-blue-50 text-gray-700">
             <tr>
+              <th class="p-3">NIS</th>
               <th class="p-3">Nama</th>
               <th class="p-3">Kelas</th>
               <th class="p-3">Tanggal</th>
@@ -26,13 +27,31 @@
             </tr>
           </thead>
           <tbody>
-            <!-- Data dummy -->
-            <tr class="border-t">
-              <td class="p-3">Siti Rahma</td>
-              <td class="p-3">7A</td>
-              <td class="p-3">2025-05-15</td>
-              <td class="p-3 text-green-600 font-semibold">Hadir</td>
+            {% for absensi in data_absensi %}
+            <tr class="border-t hover:bg-gray-50">
+              <td class="p-3">{{ absensi.nis }}</td>
+              <td class="p-3">{{ absensi.nama }}</td>
+              <td class="p-3">{{ absensi.kelas }}</td>
+              <td class="p-3">{{ absensi.tanggal }}</td>
+              <td class="p-3 font-semibold 
+                {% if absensi.status.lower() == 'hadir' %}
+                  text-green-600
+                {% elif absensi.status.lower() == 'izin' %}
+                  text-yellow-600
+                {% elif absensi.status.lower() == 'sakit' %}
+                  text-blue-600
+                {% else %}
+                  text-red-600
+                {% endif %}
+              ">
+                {{ absensi.status }}
+              </td>
             </tr>
+            {% else %}
+            <tr>
+              <td class="p-3 text-center text-gray-500" colspan="5">Belum ada data absensi</td>
+            </tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>

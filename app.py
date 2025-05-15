@@ -112,7 +112,9 @@ def input_absensi():
 
 @app.route('/laporan')
 def laporan():
-    return render_template('laporan.html')
+    data_absensi = baca_semua_absensi()
+    return render_template('laporan.html', data_absensi=data_absensi)
+
 
 # @app.route('/pengaturan')
 # def pengaturan():
