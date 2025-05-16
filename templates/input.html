@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <title>Input Absensi</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans">
   <div class="flex min-h-screen">
@@ -15,10 +16,10 @@
     <main class="flex-1 p-10">
       <h1 class="text-2xl font-bold mb-6">📝 Input Absensi</h1>
 
-    <form method="POST" action="{{ url_for('simpan_absensi') }}" class="bg-white p-6 rounded-xl shadow-md max-w-xl space-y-4">
+    <form method="POST" action="{{ url_for('simpan_absensi') }}" class="bg-white p-6 rounded-xl shadow-md max-w-xl space-y-4" id="form_input_absensi">
      <div>
         <label class="block mb-1 font-semibold">Kelas</label>
-        <select id="kelas" name="kelas" required class="w-full p-2 border rounded" >
+        <select id="kelas" name="kelas" required class="w-full p-2 border rounded select2" >
           <option value="">-- Pilih Kelas --</option>
           <option value="7A">Kelas 7A</option>
           <option value="7B">Kelas 7B</option>
@@ -28,19 +29,19 @@
 
     <div>
        <label class="block mb-1 font-semibold">Nama Siswa</label>
-       <select id="nama" name="nama" required class="w-full p-2 border rounded">
+       <select id="siswa" name="siswa" required class="w-full p-2 border rounded select2">
           <option value="">-- Pilih Nama --</option>
        </select>
      </div>
 
         <div>
           <label class="block mb-1 font-semibold">Tanggal</label>
-          <input type="date" class="w-full p-2 border rounded" />
+          <input type="date" class="w-full p-2 border rounded" id="dt_absensi" />
         </div>
 
         <div>
           <label class="block mb-1 font-semibold">Status</label>
-          <select class="w-full p-2 border rounded">
+          <select class="w-full p-2 border rounded" id="cbo_status">
             <option>Hadir</option>
             <option>Sakit</option>
             <option>Izin</option>
@@ -54,6 +55,11 @@
       </form>
     </main>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   <script src="{{ url_for('static', filename='main.js') }}"></script>
+  <script>
+    $(".select2").select2();
+  </script>
 </body>
 </html>

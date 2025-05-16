@@ -14,22 +14,76 @@ CORS(app)
 CSV_FILE = 'absensi.csv'
 
 # ➤ NOMOR HP SETIAP SISWA (WAJIB format internasional: 628xxxx)
-siswa_to_nomor = {
-    "Ahmad": "6281234567890",
-    "Budi": "6289876543210",
-    "Citra": "6281122334455",
-    "Dina": "6289988776655",
-    # Tambahkan siswa lainnya di sini
-}
+# siswa_to_nomor = {
+#     "Ahmad": "6281234567890",
+#     "Budi": "6289876543210",
+#     "Citra": "6281122334455",
+#     "Dina": "6289988776655",
+#     # Tambahkan siswa lainnya di sini
+# }
 
-def baca_data_siswa():
-    siswa = {}
-    if os.path.exists('data_siswa.csv'):
-        with open('data_siswa.csv', 'r', encoding='utf-8') as f:
-            reader = csv.DictReader(f)
+def baca_data_siswa(kelas=None):
+    siswa_list = []
+    if not os.path.exists('data_siswa.csv'):
+        # buat file kosong dengan header jika belum ada
+        with open('data_siswa.csv', 'w', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            writer.writerow(['nis', 'nama', 'kelas', 'nomor'])
+        return siswa_list
+
+    with open('data_siswa.csv', 'r', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            # Jika ada filter kelas, filter di sini
+            if kelas is None or row['kelas'] == kelas:
+                siswa_list.append({
+                    'nis': row['nis'],
+                    'nama': row['nama'],
+                    'kelas': row['kelas'],
+                    'nomor': row['nomor']
+                })
+    return siswa_list
+
+def get_siswa_by_nis(nis):
+    if not os.path.exists('data_siswa.csv'):
+        return None
+
+    with open('data_siswa.csv', 'r', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if row['nis'] == nis:
+                return {
+                    'nis': row['nis'],
+                    'nama': row['nama'],
+                    'kelas': row['kelas'],
+                    'nomor': row['nomor']
+                }
+    return None
+
+def baca_semua_absensi():
+    hasil = []
+    if os.path.exists(CSV_FILE):
+        with open(CSV_FILE, 'r', encoding='utf-8') as f:
+            reader = csv.reader(f)
+            next(reader, None)  # Skip header
             for row in reader:
-                siswa[row['Nama']] = row['Nomor']
-    return siswa
+                if len(row) >= 5:
+                    hasil.append({
+                        "kelas": row[0],
+                        "nis": row[1],
+                        "nama": row[2],
+                        "tanggal": row[3],
+                        "status": row[4]
+                    })
+    return hasil
+
+def cek_absensi_tercatat(nis, tanggal):
+    absensi_list = baca_semua_absensi()
+    for entry in absensi_list:
+        if entry["nis"] == nis and entry["tanggal"] == tanggal:
+            return True, entry
+    return False, None
+
 
 # ➤ KIRIM PESAN WHATSAPP
 def kirim_whatsapp(nomor, pesan):
@@ -58,7 +112,9 @@ def input_absensi():
 
 @app.route('/laporan')
 def laporan():
-    return render_template('laporan.html')
+    data_absensi = baca_semua_absensi()
+    return render_template('laporan.html', data_absensi=data_absensi)
+
 
 # @app.route('/pengaturan')
 # def pengaturan():
@@ -72,41 +128,74 @@ def logout():
 @app.route('/simpan_absensi', methods=['POST'])
 def simpan_absensi():
     data = request.get_json()
-    kelas = data.get('kelas')
+    nis = data.get('nis')
     tanggal = data.get('tanggal')
-    daftar_siswa = data.get('data')
+    status = data.get('status')
 
-    with open(CSV_FILE, 'a', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file)
-        for siswa in daftar_siswa:
-            nama = siswa.get('nama')
-            status = siswa.get('status')
+    # Validasi NIS kosong
+    if not nis or nis.strip() == "":
+        return jsonify({"message": "NIS tidak ditemukan."}), 200
 
-            writer.writerow([kelas, nama, tanggal, status])
+    if not tanggal or tanggal.strip() =="" :
+        return jsonify({"message": "Pilih tanggal."}), 200
 
-            # Kirim WhatsApp jika nomor tersedia
-            nomor = siswa_to_nomor.get(nama)
-            if nomor:
-                pesan = f"Hai {nama}, Anda tercatat *{status}* pada {tanggal} di kelas {kelas}."
-                kirim_whatsapp(nomor, pesan)
+    # Ambil data siswa berdasarkan NIS
+    dSiswa = get_siswa_by_nis(nis)
+    if not dSiswa:
+        return jsonify({"message": f"Siswa dengan NIS {nis} tidak ditemukan."}), 200
 
-    return jsonify({"message": "Absensi dan notifikasi berhasil dikirim"}), 200
+    nama = dSiswa['nama']
+    kelas = dSiswa['kelas']
+    nomor = dSiswa.get('nomor')
+
+    #  Cek apakah absensi sudah tercatat
+    if cek_absensi_tercatat(nis, tanggal)[0]:
+        return jsonify({"message": f"Absensi untuk {nama} pada {tanggal} sudah tercatat."}), 200
+
+    file_exists = os.path.exists(CSV_FILE)
+
+    try:
+        # Simpan ke CSV
+        with open(CSV_FILE, 'a', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+
+            # Tulis header jika file baru
+            if not file_exists:
+                writer.writerow(['kelas', 'nis', 'nama', 'tanggal', 'status'])
+
+            writer.writerow([kelas, nis, nama, tanggal, status])
+    except Exception as e:
+        return jsonify({"message": f"Gagal menyimpan absensi: {str(e)}"}), 500
+
+    #  Kirim WA jika nomor tersedia
+    if nomor and nomor.strip() != "":
+        pesan = f"Hai {nama}, Anda tercatat *{status}* pada {tanggal} di kelas {kelas}."
+        wa_response = kirim_whatsapp(nomor, pesan)
+
+        if wa_response.get('sent') or wa_response.get('status') == 'success':
+            return jsonify({"message": f"Absensi {nama} berhasil disimpan dan WhatsApp dikirim."}), 200
+        else:
+            return jsonify({"message": f"Absensi {nama} berhasil disimpan, tapi WhatsApp gagal dikirim."}), 200
+
+    return jsonify({"message": f"Absensi {nama} berhasil disimpan. Nomor WhatsApp tidak tersedia."}), 200
+
+
 
 # ➤ API AMBIL DATA ABSENSI
 @app.route('/absensi', methods=['GET'])
 def ambil_absensi():
-    hasil = []
-    if os.path.exists(CSV_FILE):
-        with open(CSV_FILE, 'r', encoding='utf-8') as f:
-            reader = csv.reader(f)
-            for row in reader:
-                hasil.append({
-                    "nama": row[1],
-                    "kelas": row[0],
-                    "tanggal": row[2],
-                    "status": row[3]
-                })
-    return jsonify(hasil)
+    nis = request.args.get("nis")
+    tanggal = request.args.get("tanggal")
+
+    if nis and tanggal:
+        found, data = cek_absensi_tercatat(nis, tanggal)
+        if found:
+            return jsonify({"exists": True, "data": data}), 200
+        else:
+            return jsonify({"exists": False, "message": "Absensi tidak ditemukan"}), 200
+    else:
+        return jsonify(baca_semua_absensi()), 200
+
     
 @app.route('/pengaturan', methods=['GET', 'POST'])
 def pengaturan():
@@ -155,19 +244,7 @@ def get_siswa():
     data = request.get_json()
     kelas = data.get("kelas") if data else None
 
-    # Data statis dummy siswa
-    siswa_list = [
-        {"nama": "Ahmad", "kelas": "7A", "nomor": "6281234567890"},
-        {"nama": "Budi", "kelas": "7B", "nomor": "6289876543210"},
-        {"nama": "Citra", "kelas": "7A", "nomor": "6281122334455"},
-        {"nama": "Dina", "kelas": "8A", "nomor": "6289988776655"},
-    ]
-
-    # Filter berdasarkan kelas jika ada
-    if kelas:
-        filtered_siswa = [s for s in siswa_list if s['kelas'] == kelas]
-        return jsonify(filtered_siswa)
-
+    siswa_list = baca_data_siswa(kelas)
     return jsonify(siswa_list)
 
 if __name__ == '__main__':
